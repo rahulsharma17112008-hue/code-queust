@@ -7,6 +7,18 @@ export function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const getURL = () => {
+    let url =
+      import.meta.env.VITE_SITE_URL ?? // Set this to your site URL in production env.
+      import.meta.env.VITE_VERCEL_URL ?? // Automatically set by Vercel.
+      window.location.origin;
+    // Make sure to include `https://` when not localhost.
+    url = url.startsWith('http') ? url : `https://${url}`;
+    // Make sure to include a trailing `/`.
+    url = url.endsWith('/') ? url : `${url}/`;
+    return url;
+  };
+
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
@@ -14,7 +26,7 @@ export function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: getURL(),
         },
       });
       if (error) throw error;
